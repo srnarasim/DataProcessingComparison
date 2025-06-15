@@ -2,6 +2,18 @@
 
 *A practical guide to making the right choice for your data processing needs in 2025*
 
+## 🚀 **Interactive Notebooks - Try It Yourself!**
+
+| Scenario | Description | Best Tool | Notebook |
+|----------|-------------|-----------|----------|
+| **📊 Overview** | Complete comparison & decision tree | All Tools | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/srnarasim/DataProcessingComparison/blob/main/overview.ipynb) |
+| **1️⃣ Data Scientist** | Interactive exploration, memory limits | DuckDB/Polars | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/srnarasim/DataProcessingComparison/blob/main/scenario1.ipynb) |
+| **2️⃣ Production ETL** | Reliability, monitoring, fault tolerance | Spark | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/srnarasim/DataProcessingComparison/blob/main/scenario2.ipynb) |
+| **3️⃣ Real-time Analytics** | Sub-second queries, concurrent users | DuckDB | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/srnarasim/DataProcessingComparison/blob/main/scenario3.ipynb) |
+| **4️⃣ ML Features** | Complex features, ML integration | Pandas | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/srnarasim/DataProcessingComparison/blob/main/scenario4.ipynb) |
+
+> 💡 **Start with the [Overview Notebook](https://colab.research.google.com/github/srnarasim/DataProcessingComparison/blob/main/overview.ipynb)** for a comprehensive decision tree and tool comparison matrix!
+
 ---
 
 ## The Problem: Too Many Good Options
