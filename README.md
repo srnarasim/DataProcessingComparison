@@ -1,4 +1,4 @@
-# The Great Data Processing Showdown: Pandas vs Polars vs Spark vs DuckDB
+# The Great Data Processing Showdown: Pandas vs Polars vs Spark vs DuckDB vs TabsData
 
 *A data engineer's guide to choosing the right tool for the job in 2025*
 
@@ -34,7 +34,7 @@ This isn't another synthetic benchmark comparing artificial workloads. Instead, 
 
 ## Meet the Contenders
 
-Before we dive into the scenarios, let's meet our four heavyweight champions:
+Before we dive into the scenarios, let's meet our five heavyweight champions:
 
 🐼 **Pandas**: The established king of exploratory data analysis  
 *"I've been here since 2008, and I know every ML library personally"*
@@ -47,6 +47,9 @@ Before we dive into the scenarios, let's meet our four heavyweight champions:
 
 🦆 **DuckDB**: The analytical database that thinks it's a DataFrame library  
 *"Why choose between SQL and DataFrames when you can have both?"*
+
+📊 **TabsData**: The data integration platform with governance built-in  
+*"Pub/sub for tables with lineage tracking? I make data governance effortless."*
 
 > **🔍 Visual Decision Tree**: Check out the [interactive decision tree in our overview notebook](https://colab.research.google.com/github/srnarasim/DataProcessingComparison/blob/main/overview.ipynb) to see which tool fits your constraints best!
 
@@ -113,15 +116,38 @@ def duckdb_clv_analysis():
         GROUP BY customer_id
         HAVING days_active > 30
     """).df()
+
+# TabsData approach - governed data processing with lineage
+import tabsdata as td
+
+@td.transformer(
+    input_tables=["transactions"],
+    output_tables=["customer_clv"]
+)
+def tabsdata_clv_analysis(transactions: td.TableFrame) -> td.TableFrame:
+    return (transactions
+            .group_by('customer_id')
+            .agg([
+                td.col('order_total').sum().alias('total_spent'),
+                td.col('order_total').count().alias('order_count'),
+                td.col('order_total').mean().alias('avg_order'),
+                td.col('order_date').min().alias('first_order'),
+                td.col('order_date').max().alias('last_order')
+            ])
+            .with_columns([
+                (td.col('last_order') - td.col('first_order')).dt.total_days().alias('days_active')
+            ])
+            .filter(td.col('days_active') > 30))
 ```
 
 **🏆 The Results:**
 - **🐼 Pandas**: Familiar and feature-rich, but consumes 2.3GB memory (ouch!)
 - **⚡ Polars**: 3x faster execution, 60% less memory usage, but requires learning new syntax
 - **🦆 DuckDB**: SQL familiarity meets DataFrame convenience, performance comparable to Polars
+- **📊 TabsData**: Polars-like performance with built-in lineage tracking, but requires server setup
 - **🔥 Spark**: Complete overkill - startup overhead makes it slower than Pandas for this size
 
-**🥇 Winner**: DuckDB for mixed SQL/Python teams, Polars for performance-conscious pure Python teams
+**🥇 Winner**: DuckDB for mixed SQL/Python teams, Polars for performance-conscious pure Python teams, TabsData for governance-first organizations
 
 > **📊 See the Performance Charts**: Run the [Scenario 1 notebook](https://colab.research.google.com/github/srnarasim/DataProcessingComparison/blob/main/scenario1.ipynb) to see detailed memory usage and execution time comparisons!
 
@@ -196,15 +222,59 @@ def polars_etl_pipeline():
     
     # Write (requires custom partitioning logic)
     processed.write_parquet("output/customer-analytics.parquet")
+
+# TabsData approach - built-in governance and monitoring
+@td.publisher(
+    td.S3Source(
+        "s3://data-lake/transactions/2025/01/*/",
+        td.S3AccessKeyCredentials(
+            td.EnvironmentSecret("AWS_ACCESS_KEY_ID"),
+            td.EnvironmentSecret("AWS_SECRET_KEY")
+        )
+    ),
+    tables=["raw_transactions"]
+)
+def tabsdata_publisher(raw_transactions: td.TableFrame) -> td.TableFrame:
+    return raw_transactions
+
+@td.transformer(
+    input_tables=["raw_transactions"],
+    output_tables=["customer_analytics"]
+)
+def tabsdata_etl_pipeline(raw_transactions: td.TableFrame) -> td.TableFrame:
+    return (raw_transactions
+            .with_columns([
+                td.col("order_date").dt.weekday().is_in([6, 7]).alias("is_weekend")
+            ])
+            .group_by(["customer_id", "product_category"])
+            .agg([
+                td.col("order_total").sum().alias("category_total"),
+                td.col("order_id").n_unique().alias("order_count"),
+                td.col("product_id").list().alias("products_purchased")
+            ]))
+
+@td.subscriber(
+    "customer_analytics",
+    td.S3Destination(
+        "s3://data-warehouse/customer-analytics/",
+        td.S3AccessKeyCredentials(
+            td.EnvironmentSecret("AWS_ACCESS_KEY_ID"),
+            td.EnvironmentSecret("AWS_SECRET_KEY")
+        )
+    )
+)
+def tabsdata_subscriber(customer_analytics: td.TableFrame) -> td.TableFrame:
+    return customer_analytics
 ```
 
 **🏆 The Results:**
 - **🔥 Spark**: Built-in fault tolerance, comprehensive monitoring, resource management, enterprise ecosystem integration
+- **📊 TabsData**: Excellent governance and lineage tracking, pub/sub architecture, built-in monitoring, but requires infrastructure setup
 - **⚡ Polars**: Lightning-fast processing but requires building custom production infrastructure from scratch
 - **🐼 Pandas**: Memory limitations make it unsuitable for this scale (sorry, old friend)
 - **🦆 DuckDB**: Good performance but limited distributed processing capabilities
 
-**🥇 Winner**: Spark for enterprise ETL, Polars for high-performance batch processing with custom infrastructure investment
+**🥇 Winner**: Spark for enterprise ETL, TabsData for governance-first ETL pipelines, Polars for high-performance batch processing with custom infrastructure investment
 
 > **📈 Production Metrics**: The [Scenario 2 notebook](https://colab.research.google.com/github/srnarasim/DataProcessingComparison/blob/main/scenario2.ipynb) shows detailed reliability comparisons and fault tolerance demonstrations!
 
@@ -274,15 +344,40 @@ class PolarsAnalyticsService:
                     (pl.col("month") >= cutoff_date)
                 )
                 .sort("month"))
+
+# TabsData approach - governed analytics with pub/sub
+class TabsDataAnalyticsService:
+    def __init__(self):
+        # Subscribe to pre-computed metrics table
+        self.client = td.Client()
+    
+    @td.subscriber(
+        "customer_metrics",
+        td.LocalDestination("analytics_cache.parquet")
+    )
+    def cache_metrics(self, customer_metrics: td.TableFrame) -> td.TableFrame:
+        return customer_metrics
+    
+    def get_customer_trend(self, customer_id, months=12):
+        # Query from cached table with lineage tracking
+        cutoff_date = datetime.now() - timedelta(days=30*months)
+        return (self.client.get_table("customer_metrics")
+                .filter(
+                    (td.col("customer_id") == customer_id) &
+                    (td.col("month") >= cutoff_date)
+                )
+                .sort("month")
+                .to_pandas())  # Convert for dashboard integration
 ```
 
 **🏆 The Results:**
 - **🦆 DuckDB**: Excellent for analytical workloads, handles concurrent queries gracefully, persistent storage with columnar optimization
+- **📊 TabsData**: Good performance with built-in governance and lineage tracking, but requires server infrastructure
 - **⚡ Polars**: Blazing fast but limited by memory constraints, requires sophisticated application-level caching
 - **🐼 Pandas**: Too slow for real-time requirements (users would revolt)
 - **🔥 Spark**: Great for batch pre-aggregation, but high latency for ad-hoc queries kills the user experience
 
-**🥇 Winner**: DuckDB for analytical dashboards, with Spark for pre-aggregating large datasets
+**🥇 Winner**: DuckDB for analytical dashboards, TabsData for governed analytics, with Spark for pre-aggregating large datasets
 
 > **⏱️ Response Time Analysis**: The [Scenario 3 notebook](https://colab.research.google.com/github/srnarasim/DataProcessingComparison/blob/main/scenario3.ipynb) includes concurrent user simulations and response time benchmarks!
 
@@ -384,9 +479,10 @@ def duckdb_feature_engineering():
 - **🐼 Pandas**: Unmatched ecosystem integration and flexibility, but slow on large datasets (the ML ecosystem's best friend)
 - **⚡ Polars**: Lightning-fast feature computation but often needs conversion to Pandas for ML libraries
 - **🦆 DuckDB**: Excellent for complex SQL-based feature engineering with easy Pandas integration
+- **📊 TabsData**: Good performance with built-in versioning and lineage for feature reproducibility, but requires infrastructure setup
 - **🔥 Spark**: Powerful for large-scale feature engineering with MLlib integration, but overkill for experimentation
 
-**🥇 Winner**: Pandas for rapid prototyping, DuckDB for complex features, Spark for production ML pipelines at scale
+**🥇 Winner**: Pandas for rapid prototyping, DuckDB for complex features, TabsData for governed ML pipelines, Spark for production ML pipelines at scale
 
 > **🧪 Feature Engineering Deep Dive**: The [Scenario 4 notebook](https://colab.research.google.com/github/srnarasim/DataProcessingComparison/blob/main/scenario4.ipynb) demonstrates advanced feature engineering techniques and ML integration patterns!
 
@@ -394,16 +490,18 @@ def duckdb_feature_engineering():
 
 Here's the truth table that will save you hours of research:
 
-| Constraint | 🐼 Pandas | ⚡ Polars | 🔥 Spark | 🦆 DuckDB |
-|------------|-----------|-----------|----------|-----------|
-| **Data Size** | <5GB | <100GB | Any size | <1TB |
-| **Memory Usage** | High 😰 | Low 😍 | Configurable 🔧 | Medium 😊 |
-| **Learning Curve** | Gentle 📚 | Moderate 📖 | Steep 🧗‍♂️ | Gentle (SQL) 📝 |
-| **Performance** | Baseline 🐌 | 2-10x faster ⚡ | Scales horizontally 🚀 | 5-20x faster (analytical) 🦆 |
-| **Ecosystem** | Richest 🌟 | Growing 🌱 | Comprehensive 🏢 | Limited but growing 🌿 |
-| **Production Ready** | Moderate ⚠️ | Good ✅ | Excellent 💎 | Good ✅ |
-| **Concurrency** | Poor 😞 | Good 👍 | Excellent 🎯 | Good 👍 |
-| **SQL Support** | Limited 🤏 | Good 👌 | Excellent 💯 | Native 🏠 |
+| Constraint | 🐼 Pandas | ⚡ Polars | 🔥 Spark | 🦆 DuckDB | 📊 TabsData |
+|------------|-----------|-----------|----------|-----------|------------|
+| **Data Size** | <5GB | <100GB | Any size | <1TB | <500GB |
+| **Memory Usage** | High 😰 | Low 😍 | Configurable 🔧 | Medium 😊 | Low 😍 |
+| **Learning Curve** | Gentle 📚 | Moderate 📖 | Steep 🧗‍♂️ | Gentle (SQL) 📝 | Moderate 📖 |
+| **Performance** | Baseline 🐌 | 2-10x faster ⚡ | Scales horizontally 🚀 | 5-20x faster (analytical) 🦆 | 2-8x faster ⚡ |
+| **Ecosystem** | Richest 🌟 | Growing 🌱 | Comprehensive 🏢 | Limited but growing 🌿 | Limited 🌿 |
+| **Production Ready** | Moderate ⚠️ | Good ✅ | Excellent 💎 | Good ✅ | Excellent 💎 |
+| **Concurrency** | Poor 😞 | Good 👍 | Excellent 🎯 | Good 👍 | Good 👍 |
+| **SQL Support** | Limited 🤏 | Good 👌 | Excellent 💯 | Native 🏠 | Good 👌 |
+| **Governance** | None 😞 | None 😞 | Basic 📋 | None 😞 | Excellent 💎 |
+| **Lineage** | None 😞 | None 😞 | Basic 📋 | None 😞 | Native 🏠 |
 
 > **📈 Interactive Comparison**: See the [comprehensive capability heatmap and performance charts](https://colab.research.google.com/github/srnarasim/DataProcessingComparison/blob/main/overview.ipynb) in our overview notebook!
 
@@ -434,6 +532,13 @@ Here's the truth table that will save you hours of research:
 - **Your workload is transactional** (OLTP vs OLAP mismatch)
 - **You need real-time streaming** (batch-oriented design)
 - **Complex nested data structures** that don't map well to SQL
+
+### 📊 Don't Use TabsData When:
+- **You need simple, lightweight data processing** (infrastructure overhead too high)
+- **Your team lacks DevOps expertise** (server setup and maintenance required)
+- **You're doing exploratory data analysis** (pub/sub model adds unnecessary complexity)
+- **Budget constraints are tight** (enterprise features come with costs)
+- **You need real-time streaming** (batch-oriented pub/sub design)
 
 ## 🔄 The Hybrid Approach: Why Choose One When You Can Have All?
 
