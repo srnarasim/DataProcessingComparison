@@ -33,7 +33,17 @@
 git clone https://github.com/srnarasim/DataProcessingComparison.git
 cd DataProcessingComparison
 pip install -r requirements.txt
+
+# Generate sample data (required for scenarios)
+python setup_data.py
+
+# Start services
 jupyter lab
+```
+
+**Troubleshooting**: If you encounter "File not found" errors in notebooks, run:
+```bash
+python setup_data.py
 ```
 
 ---

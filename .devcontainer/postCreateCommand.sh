@@ -10,6 +10,15 @@ pip install --upgrade pip
 echo "📦 Installing Python dependencies..."
 pip install -r requirements.txt
 
+# Generate sample data if it doesn't exist
+echo "📊 Checking for sample data..."
+if [ ! -d "data/transactions" ]; then
+    echo "📊 Generating sample data for scenarios..."
+    python generate_sample_data.py
+else
+    echo "✅ Sample data already exists"
+fi
+
 # Set up Jupyter configuration
 echo "🔧 Configuring Jupyter..."
 mkdir -p ~/.jupyter

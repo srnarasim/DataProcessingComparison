@@ -194,7 +194,7 @@ cython_debug/
 .cursorindexingignore
 
 # Data Processing Specific
-# Generated data files
+# Generated data files (can be regenerated with setup_data.py)
 data/
 output/
 *.parquet
