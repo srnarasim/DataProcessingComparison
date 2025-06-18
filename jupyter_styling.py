@@ -165,7 +165,17 @@ def setup_jupyter_display():
     from IPython import get_ipython
     ipython = get_ipython()
     if ipython:
-        ipython.magic('matplotlib inline')
+        try:
+            # Try the newer method first
+            ipython.run_line_magic('matplotlib', 'inline')
+        except AttributeError:
+            # Fallback to older method if available
+            try:
+                ipython.magic('matplotlib inline')
+            except AttributeError:
+                # If neither works, try importing matplotlib directly
+                import matplotlib
+                matplotlib.use('inline')
     
     # Custom CSS for better notebook appearance
     css = """
@@ -248,7 +258,12 @@ def setup_jupyter_display():
     </style>
     """
     
-    display(HTML(css))
+    try:
+        from IPython.display import HTML, display
+        display(HTML(css))
+    except ImportError:
+        # If IPython is not available, skip CSS styling
+        pass
 
 def create_performance_badge(value, metric_type='time', thresholds=None):
     """
@@ -322,8 +337,12 @@ def setup_notebook_styling(style='professional', dpi=100, enable_plotly=True):
         print(f"✅ Plotly configured with '{style}' theme")
     
     # Setup Jupyter display
-    setup_jupyter_display()
-    print("✅ Jupyter display settings configured")
+    try:
+        setup_jupyter_display()
+        print("✅ Jupyter display settings configured")
+    except Exception as e:
+        print(f"⚠️ Jupyter display setup failed: {e}")
+        print("   Continuing with basic styling...")
     
     print("🎉 Notebook styling setup complete!")
     
