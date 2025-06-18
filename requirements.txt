@@ -8,8 +8,8 @@ pyarrow>=10.0.0
 pyspark>=3.5.0
 findspark>=2.0.0
 
-# TabsData (simulated - would be actual package in production)
-# tabsdata>=1.0.0
+# TabsData - Pub/Sub server for tables with enterprise governance
+tabsdata>=0.9.6
 
 # Jupyter and notebook support
 jupyter>=1.0.0
