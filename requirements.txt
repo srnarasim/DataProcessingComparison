@@ -46,3 +46,6 @@ tqdm>=4.65.0
 # File format support
 openpyxl>=3.1.0
 xlsxwriter>=3.1.0
+
+# HTTP requests for server health checks
+requests>=2.31.0
