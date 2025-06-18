@@ -165,7 +165,19 @@ def setup_jupyter_display():
     from IPython import get_ipython
     ipython = get_ipython()
     if ipython:
-        ipython.magic('matplotlib inline')
+        try:
+            # Use modern magic method
+            ipython.run_line_magic('matplotlib', 'inline')
+        except (AttributeError, Exception):
+            # Fallback: set matplotlib backend directly
+            import matplotlib
+            matplotlib.use('Agg')
+            print("ℹ️  Using fallback matplotlib backend (Agg)")
+    else:
+        # Not in IPython environment, set backend directly
+        import matplotlib
+        matplotlib.use('Agg')
+        print("ℹ️  Not in IPython environment, using Agg backend")
     
     # Custom CSS for better notebook appearance
     css = """
