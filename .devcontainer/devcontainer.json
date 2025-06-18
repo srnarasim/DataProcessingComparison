@@ -44,14 +44,14 @@
 
   "postCreateCommand": "bash .devcontainer/postCreateCommand.sh",
   
-  "forwardPorts": [8888, 9090, 8000, 5000],
+  "forwardPorts": [8888, 8080, 8000, 5000],
   
   "portsAttributes": {
     "8888": {
       "label": "Jupyter Lab",
       "onAutoForward": "notify"
     },
-    "9090": {
+    "8080": {
       "label": "TabsData Server",
       "onAutoForward": "notify"
     },
