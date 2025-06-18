@@ -6,15 +6,35 @@
 
 ## 🚀 **Interactive Notebooks - Try It Yourself!**
 
-| Scenario | Description | Best Tool | Notebook |
-|----------|-------------|-----------|----------|
-| **📊 Overview** | Complete comparison & decision tree | All Tools | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/srnarasim/DataProcessingComparison/blob/main/overview.ipynb) |
-| **1️⃣ Data Scientist** | Interactive exploration, memory limits | DuckDB/Polars | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/srnarasim/DataProcessingComparison/blob/main/scenario1.ipynb) |
-| **2️⃣ Production ETL** | Reliability, monitoring, fault tolerance | Spark | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/srnarasim/DataProcessingComparison/blob/main/scenario2.ipynb) |
-| **3️⃣ Real-time Analytics** | Sub-second queries, concurrent users | DuckDB | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/srnarasim/DataProcessingComparison/blob/main/scenario3.ipynb) |
-| **4️⃣ ML Features** | Complex features, ML integration | Pandas | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/srnarasim/DataProcessingComparison/blob/main/scenario4.ipynb) |
+### Quick Start Options
+
+**🌟 GitHub Codespaces (Recommended)**  
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/srnarasim/DataProcessingComparison)  
+*Full development environment with Python 3.12, all dependencies pre-installed*
+
+**☁️ Google Colab (Browser-only)**  
+*No setup required, runs in your browser*
+
+| Scenario | Description | Best Tool | Codespaces | Colab |
+|----------|-------------|-----------|------------|-------|
+| **📊 Overview** | Complete comparison & decision tree | All Tools | [🚀 Open](https://codespaces.new/srnarasim/DataProcessingComparison) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/srnarasim/DataProcessingComparison/blob/main/overview.ipynb) |
+| **1️⃣ Data Scientist** | Interactive exploration, memory limits | DuckDB/Polars | [🚀 Open](https://codespaces.new/srnarasim/DataProcessingComparison) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/srnarasim/DataProcessingComparison/blob/main/scenario1.ipynb) |
+| **2️⃣ Production ETL** | Reliability, monitoring, fault tolerance | Spark | [🚀 Open](https://codespaces.new/srnarasim/DataProcessingComparison) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/srnarasim/DataProcessingComparison/blob/main/scenario2.ipynb) |
+| **3️⃣ Real-time Analytics** | Sub-second queries, concurrent users | DuckDB | [🚀 Open](https://codespaces.new/srnarasim/DataProcessingComparison) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/srnarasim/DataProcessingComparison/blob/main/scenario3.ipynb) |
+| **4️⃣ ML Features** | Complex features, ML integration | Pandas | [🚀 Open](https://codespaces.new/srnarasim/DataProcessingComparison) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/srnarasim/DataProcessingComparison/blob/main/scenario4.ipynb) |
 
 > 💡 **Start with the [Overview Notebook](https://colab.research.google.com/github/srnarasim/DataProcessingComparison/blob/main/overview.ipynb)** for an interactive decision tree and comprehensive tool comparison matrix!
+
+### 🛠️ Local Development Setup
+
+**Prerequisites**: Python 3.12, Java 11 (for Spark)
+
+```bash
+git clone https://github.com/srnarasim/DataProcessingComparison.git
+cd DataProcessingComparison
+pip install -r requirements.txt
+jupyter lab
+```
 
 ---
 
